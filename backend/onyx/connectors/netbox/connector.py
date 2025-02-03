@@ -24,7 +24,7 @@ class NetboxConnector(LoadConnector, PollConnector):
         self, batch_size: int = INDEX_BATCH_SIZE, 
         url: str | None = None, 
         token: str | None = None,
-        tags: list[str]
+        tags: list[str] = []
     ) -> None:
         self.batch_size = batch_size
         self.netbox_url = url
