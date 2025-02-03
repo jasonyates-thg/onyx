@@ -87,6 +87,7 @@ import cohereIcon from "../../../public/Cohere.svg";
 import voyageIcon from "../../../public/Voyage.png";
 import googleIcon from "../../../public/Google.webp";
 import xenforoIcon from "../../../public/Xenforo.svg";
+import netboxIcon from "../../../public/netbox.png";
 import { FaGithub, FaRobot } from "react-icons/fa";
 
 import { cn } from "@/lib/utils";
@@ -3032,4 +3033,11 @@ export const SearchAssistantIcon = ({
       />
     </svg>
   );
+};
+
+export const NetboxIcon = ({
+  size = 16,
+  className = defaultTailwindCSS,
+}: IconProps) => {
+  return <LogoIcon size={size} className={className} src={netboxIcon} />;
 };

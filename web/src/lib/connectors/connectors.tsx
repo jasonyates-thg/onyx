@@ -1118,6 +1118,19 @@ For example, specifying .*-support.* as a "channel" will cause the connector to 
     advanced_values: [],
     overrideDefaultFreq: 60 * 60 * 24,
   },
+  netbox: {
+    description: "Configure Nebox connector",
+    values: [
+      {
+        type: "list",
+        query: "Enter tags to filter included documents:",
+        label: "Tags",
+        name: "tags",
+        optional: true,
+      },
+    ],
+    advanced_values: [],
+  },
 };
 export function createConnectorInitialValues(
   connector: ConfigurableSources
@@ -1398,3 +1411,7 @@ export interface MediaWikiConfig extends MediaWikiBaseConfig {
 }
 
 export interface WikipediaConfig extends MediaWikiBaseConfig {}
+
+export interface NetboxConfig {
+  tags?: string[];
+}

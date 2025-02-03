@@ -43,6 +43,7 @@ import {
   AirtableIcon,
   GlobeIcon2,
   FileIcon2,
+  NetboxIcon,
 } from "@/components/icons/icons";
 import { ValidSources } from "./types";
 import {
@@ -327,6 +328,12 @@ export const SOURCE_METADATA_MAP: SourceMap = {
     icon: GlobeIcon,
     displayName: "Not Applicable",
     category: SourceCategory.Other,
+  },
+  netbox: {
+    icon: NetboxIcon,
+    displayName: "Netbox",
+    category: SourceCategory.Other,
+    docs: "https://docs.onyx.app/connectors/netbox",
   },
 } as SourceMap;
 

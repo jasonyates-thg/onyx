@@ -221,6 +221,12 @@ export interface AirtableCredentialJson {
   airtable_access_token: string;
 }
 
+export interface NetboxCredentialJson {
+  netbox_base_url: string;
+  netbox_api_token: string;
+}
+
+
 export const credentialTemplates: Record<ValidSources, any> = {
   github: { github_access_token: "" } as GithubCredentialJson,
   gitlab: {
@@ -331,6 +337,10 @@ export const credentialTemplates: Record<ValidSources, any> = {
   airtable: {
     airtable_access_token: "",
   } as AirtableCredentialJson,
+  netbox: {
+    netbox_base_url: "",
+    netbox_api_token: "",
+  } as NetboxCredentialJson,
   xenforo: null,
   google_sites: null,
   file: null,
