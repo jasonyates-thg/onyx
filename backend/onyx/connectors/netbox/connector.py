@@ -129,8 +129,11 @@ class NetboxConnector(LoadConnector, PollConnector):
             device_details = {
                 "name": device.name or "Unnamed Device",
                 "device_type": str(device.device_type.display) if device.device_type else "Unknown Type",
-                "device_role": str(device.device_role.display) if device.device_role else "Unassigned",
+                "role": str(device.role.display) if device.role else "Unknown Role",
+                "tenant_name": str(device.tenant.name) if device.tenant else "Unassigned",
+                "tenant_description": str(device.tenant.description) if device.tenant else "Unassigned",
                 "site": str(device.site.display) if device.site else "No Site",
+                "rack": str(device.rack.display) if device.rack else "No Rack",
                 "status": str(device.status.label) if device.status else "Unknown",
                 "serial": device.serial or "N/A",
                 "asset_tag": device.asset_tag or "N/A",
