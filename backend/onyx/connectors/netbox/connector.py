@@ -60,6 +60,21 @@ class NetboxConnector(LoadConnector, PollConnector):
 
         return None
 
+    def _parse_datetime(self, dt_str: str) -> datetime:
+        """
+        Parse datetime string and convert to UTC datetime
+        """
+        try:
+            # Parse the datetime string to a datetime object
+            parsed_dt = datetime.fromisoformat(dt_str.replace('Z', '+00:00'))
+            
+            # Ensure it's in UTC
+            return parsed_dt.astimezone(timezone.utc)
+        except Exception as e:
+            logger.warning(f"Failed to parse datetime {dt_str}: {e}")
+            return datetime.now(timezone.utc)
+
+
     def _process_devices(
         self, start: datetime | None = None, end: datetime | None = None
     ) -> GenerateDocumentsOutput:
@@ -76,7 +91,13 @@ class NetboxConnector(LoadConnector, PollConnector):
 
         for device in devices:
             # Convert last updated to datetime and check time filters
-            updated_at = device.last_updated.replace(tzinfo=timezone.utc)
+            try:
+                # Use the custom datetime parsing method
+                updated_at = self._parse_datetime(str(device.last_updated))
+            except Exception as e:
+                logger.warning(f"Could not parse last_updated for device {device.name}: {e}")
+                continue
+
             if start is not None and updated_at < start:
                 continue
             if end is not None and updated_at > end:
@@ -85,10 +106,10 @@ class NetboxConnector(LoadConnector, PollConnector):
             # Construct comprehensive device information
             device_details = {
                 "name": device.name or "Unnamed Device",
-                "device_type": device.device_type.display if device.device_type else "Unknown Type",
-                "device_role": device.device_role.display if device.device_role else "Unassigned",
-                "site": device.site.display if device.site else "No Site",
-                "status": device.status.label if device.status else "Unknown",
+                "device_type": str(device.device_type.display) if device.device_type else "Unknown Type",
+                "device_role": str(device.device_role.display) if device.device_role else "Unassigned",
+                "site": str(device.site.display) if device.site else "No Site",
+                "status": str(device.status.label) if device.status else "Unknown",
                 "serial": device.serial or "N/A",
                 "asset_tag": device.asset_tag or "N/A"
             }
