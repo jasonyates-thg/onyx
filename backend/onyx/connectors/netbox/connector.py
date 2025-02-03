@@ -28,6 +28,7 @@ class NetboxConnector(LoadConnector, PollConnector):
         self.batch_size = batch_size
         self.netbox_url = url
         self.api_token = token
+        self.tags = tags or []
         self.client = None
         self.base_device_url = f"{url}/dcim/devices/"
 
@@ -74,20 +75,41 @@ class NetboxConnector(LoadConnector, PollConnector):
             logger.warning(f"Failed to parse datetime {dt_str}: {e}")
             return datetime.now(timezone.utc)
 
+    def _ensure_utc(self, dt: datetime) -> datetime:
+        """
+        Ensure datetime is in UTC timezone, converting if necessary
+        """
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
 
     def _process_devices(
         self, start: datetime | None = None, end: datetime | None = None
     ) -> GenerateDocumentsOutput:
         """
-        Retrieve and process Netbox devices, optionally filtered by last updated time
+        Retrieve and process Netbox devices, optionally filtered by last updated time and tags
         """
         if self.client is None:
             raise ConnectorMissingCredentialError("Netbox")
 
+        # Ensure start and end datetimes are in UTC if provided
+        if start is not None:
+            start = self._ensure_utc(start)
+        if end is not None:
+            end = self._ensure_utc(end)
+
         doc_batch: list[Document] = []
 
-        # Retrieve all devices with as much detailed information as possible
-        devices = self.client.dcim.devices.all()
+        # Retrieve devices with tag filtering
+        if self.tags:
+            # Use list comprehension to filter devices with matching tags
+            devices = [
+                device for device in self.client.dcim.devices.all() 
+                if any(tag.name in self.tags for tag in device.tags)
+            ]
+        else:
+            # If no tags specified, retrieve all devices
+            devices = self.client.dcim.devices.all()
 
         for device in devices:
             # Convert last updated to datetime and check time filters
@@ -111,7 +133,8 @@ class NetboxConnector(LoadConnector, PollConnector):
                 "site": str(device.site.display) if device.site else "No Site",
                 "status": str(device.status.label) if device.status else "Unknown",
                 "serial": device.serial or "N/A",
-                "asset_tag": device.asset_tag or "N/A"
+                "asset_tag": device.asset_tag or "N/A",
+                "tags": [str(tag.name) for tag in device.tags]  # Include tags in metadata
             }
 
             # Construct a detailed text description
