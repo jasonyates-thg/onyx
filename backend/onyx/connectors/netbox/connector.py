@@ -23,7 +23,8 @@ class NetboxConnector(LoadConnector, PollConnector):
     def __init__(
         self, batch_size: int = INDEX_BATCH_SIZE, 
         url: str | None = None, 
-        token: str | None = None
+        token: str | None = None,
+        tags: list[str]
     ) -> None:
         self.batch_size = batch_size
         self.netbox_url = url
