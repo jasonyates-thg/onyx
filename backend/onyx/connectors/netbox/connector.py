@@ -18,7 +18,6 @@ from onyx.utils.logger import setup_logger
 
 logger = setup_logger()
 
-
 class NetboxConnector(LoadConnector, PollConnector):
     def __init__(
         self, batch_size: int = INDEX_BATCH_SIZE, 
@@ -40,8 +39,8 @@ class NetboxConnector(LoadConnector, PollConnector):
         - netbox_url: Base URL of the Netbox instance
         - netbox_api_token: API token for authentication
         """
-        self.netbox_url = credentials.get("netbox_url")
-        self.api_token = credentials.get("netbox_api_token")
+        self.netbox_url = credentials["netbox_base_url"]
+        self.api_token = credentials["netbox_api_token"]
 
         if not self.netbox_url or not self.api_token:
             raise ConnectorMissingCredentialError("Netbox")
@@ -55,7 +54,7 @@ class NetboxConnector(LoadConnector, PollConnector):
         # Validate connection
         try:
             # Quick test to ensure connection works
-            self.client.virtualization.clusters.count()
+            self.client.status()
         except Exception as e:
             raise Exception(f"Failed to connect to Netbox: {e}")
 
@@ -155,7 +154,7 @@ if __name__ == "__main__":
 
     connector = NetboxConnector()
     connector.load_credentials(
-        {"netbox_url": os.environ["NETBOX_BASE_URL"]},
+        {"netbox_base_url": os.environ["NETBOX_BASE_URL"]},
         {"netbox_api_token": os.environ["NETBOX_API_TOKEN"]}
     )
 
